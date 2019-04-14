@@ -25,6 +25,13 @@ angular.module('todo', ['ionic'])
     scope: $scope,
     animation: 'slide-in-up'
   });  
+
+  $ionicModal.fromTemplateUrl('new-list.html', function(modal) {
+    $scope.listModal = modal;
+  }, {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }); 
   
   // Create and load the Modal
   $ionicModal.fromTemplateUrl('connect.html', function(modal) {
@@ -55,6 +62,36 @@ angular.module('todo', ['ionic'])
     $ionicSideMenuDelegate.toggleLeft(false);
   };
 
+  $scope.createList = function(liste) {
+    if(liste!=undefined) {
+      if(liste.hasOwnProperty("name") && liste.hasOwnProperty("description")){
+        $scope.response.text4 = '';
+        $scope.new.name = liste.name;
+        $scope.new.description = liste.description;
+        $http.post('/api/laliste/create/'+$scope.utilisateur.id, $scope.new)
+        .success(function(data) {
+          $http.get('/mobile/'+$scope.utilisateur.id)
+          .success(function(data) {
+            $scope.projects=data;
+        })
+        .error(function(data) {
+            console.log('Error: ' + data);
+        }); 
+        })
+        .error(function(data) {
+            console.log('Error: ' + data);
+        });
+        $scope.listModal.hide();
+      }else{
+        $scope.response.color = 'red';
+        $scope.response.text4 = 'Certains champs ne sont pas complétés !';
+      };
+    }else{
+      $scope.response.color = 'red';
+      $scope.response.text4 = 'Ecrire une liste avant de la soumettre !';
+    };
+  };
+
   $scope.createTask = function(task) {
     if(task!=undefined) {
       if(task.name!=""){
@@ -62,7 +99,7 @@ angular.module('todo', ['ionic'])
           $scope.response.text3 = '';
           $scope.new.text = task.name;
           $scope.new.creator = $scope.utilisateur.username;
-          $http.post('/api/laliste/'+$scope.tasks._id, $scope.new)
+          $http.post('/api/laliste/'+$scope.utilisateur.id, $scope.new)
             .success(function(data) {
                 $scope.tasks = data;
             })
@@ -173,8 +210,15 @@ angular.module('todo', ['ionic'])
       $scope.response.color = 'red';
     };
 
-
   };
+
+  $scope.creationdeliste = function() {
+    $scope.listModal.show();
+  }
+
+  $scope.fermeturedeliste = function() {
+    $scope.listModal.hide();
+  }
 
   $scope.inscription = function() {
     $scope.authModal.hide();
@@ -247,6 +291,18 @@ angular.module('todo', ['ionic'])
   $scope.closeNewTask = function() {
     $scope.taskModal.hide();
     $scope.response.text3 = '';
+  };
+
+  // Open our new list modal
+  $scope.newListe = function() {
+    $scope.response.text4 = '';
+    $scope.taskModal.show();
+  };
+
+  // Close the new list modal
+  $scope.closeNewListe = function() {
+    $scope.taskModal.hide();
+    $scope.response.text4 = '';
   };
 
 })
