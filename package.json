@@ -1,6 +1,6 @@
 {  
   "scripts": {
-  "start": "ionic serve",
+  "start": "ionic serve"
 },
   "name": "staticTodo",
   "version": "0.0.1",
