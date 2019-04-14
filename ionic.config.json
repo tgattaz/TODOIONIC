@@ -1,0 +1,47 @@
+{
+  "name": "staticTodo",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic1",
+  "watchPatterns": [
+    "scss/**/*",
+    "www/**/*",
+    "!www/lib/**/*",
+    "!www/**/*.map"
+  ],
+  "proxies": [
+    {
+      "path": "/getTaskSet",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/getTaskSet"
+    },
+    {
+      "path": "/addTask",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/addTask"
+    },
+    {
+      "path": "/deleteTask",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/deleteTask"
+    },
+    {
+      "path": "/connectUser",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/connectUser"
+    },
+    {
+      "path": "/newUser",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/newUser"
+    },
+    {
+      "path": "/mobile/",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/mobile/"
+    },
+    {
+      "path": "/api/laliste/",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/todolists/api/laliste/"
+    },
+    {
+      "path": "/api/laliste/done/",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/todolists/api/laliste/done/"
+    }
+  ]
+}
