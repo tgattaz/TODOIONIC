@@ -99,7 +99,7 @@ angular.module('todo', ['ionic'])
           $scope.response.text3 = '';
           $scope.new.text = task.name;
           $scope.new.creator = $scope.utilisateur.username;
-          $http.post('/api/laliste/'+$scope.utilisateur.id, $scope.new)
+          $http.post('/api/laliste/'+$scope.tasks._id, $scope.new)
             .success(function(data) {
                 $scope.tasks = data;
             })
