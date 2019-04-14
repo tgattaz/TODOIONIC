@@ -1,4 +1,7 @@
-{
+{  
+  "scripts": {
+  "start": "ionic serve",
+},
   "name": "staticTodo",
   "version": "0.0.1",
   "description": "An Ionic project",
