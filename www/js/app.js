@@ -7,7 +7,10 @@ angular.module('todo', ['ionic'])
   $scope.ins = {};
   $scope.response = {};
   $scope.new = {};
-  $scope.projects = {};  
+  $scope.collab = {};
+  $scope.newtask = {};
+  $scope.projects = {}; 
+  $scope.projetselected = {}; 
   $scope.modification=false;
 
   $http.get('/getTaskSet')
@@ -31,6 +34,22 @@ angular.module('todo', ['ionic'])
   }, {
     scope: $scope,
     animation: 'slide-in-up'
+  }); 
+
+  $ionicModal.fromTemplateUrl('edit-list.html', function(modal) {
+    $scope.editlistModal = modal;
+  }, {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }); 
+
+  $ionicModal.fromTemplateUrl('delete-list.html', function(modal) {
+    $scope.deleteModal = modal;
+  }, {
+    scope: $scope,
+    animation: 'slide-in-up',
+    backdropClickToClose: false,
+    hardwareBackButtonClose: false
   }); 
   
   // Create and load the Modal
@@ -60,6 +79,67 @@ angular.module('todo', ['ionic'])
   $scope.selectProject = function(project, index) {
     $scope.tasks = project;
     $ionicSideMenuDelegate.toggleLeft(false);
+  };
+
+  $scope.deleteAll = function() {
+    $http.delete('/api/laliste/'+$scope.tasks._id)
+    .success(function(data) {
+        $scope.tasks = data;
+    })
+    .error(function(data) {
+        console.log('Error: ' + data);
+    });
+  };
+
+  $scope.deleteList = function() {  
+    $http.delete('/api/laliste/mdelete/'+$scope.projetselected._id)
+    .success(function(data) {
+      $http.get('/mobile/'+$scope.utilisateur.id)
+      .success(function(data) {
+        $scope.projects=data;
+        $scope.deleteModal.hide();
+    })
+    .error(function(data) {
+        console.log('Error: ' + data);
+    }); 
+    })
+    .error(function(data) {
+        console.log('Error: ' + data);
+    });   
+
+  };
+
+  $scope.editList = function(projetselected) {
+    if(projetselected!=undefined) {
+      if(projetselected.hasOwnProperty("name") && projetselected.hasOwnProperty("description")){
+        if(projetselected.name!="" && projetselected.description!=""){
+          $scope.response.text5 = '';
+          $http.post('/api/laliste/edit/'+$scope.projetselected._id, $scope.projetselected)
+          .success(function(data) {
+            $http.get('/mobile/'+$scope.utilisateur.id)
+            .success(function(data) {
+              $scope.projects=data;
+          })
+          .error(function(data) {
+              console.log('Error: ' + data);
+          }); 
+          })
+          .error(function(data) {
+              console.log('Error: ' + data);
+          });
+          $scope.editlistModal.hide();
+        }else{
+          $scope.response.color = 'red';
+          $scope.response.text5 = 'Certains champs sont vides !';
+        };
+      }else{
+        $scope.response.color = 'red';
+        $scope.response.text5 = 'Certains champs sont vides !';
+      };
+    }else{
+      $scope.response.color = 'red';
+      $scope.response.text5 = 'Certains champs sont vides !';
+    };
   };
 
   $scope.createList = function(liste) {
@@ -185,8 +265,6 @@ angular.module('todo', ['ionic'])
                 .error(function(data) {
                     console.log('Error: ' + data);
                 }); 
-  
-              
               setTimeout(function(){
                 $scope.authModal.hide();
                 delete $scope.tasks;
@@ -211,13 +289,36 @@ angular.module('todo', ['ionic'])
     };
 
   };
-
+  
   $scope.creationdeliste = function() {
     $scope.listModal.show();
   }
 
   $scope.fermeturedeliste = function() {
     $scope.listModal.hide();
+  }
+
+  $scope.creationeditiondeliste = function(project, index) {
+    $scope.projetselected.index=index;
+    $scope.projetselected.name=project.name;
+    $scope.projetselected.description=project.description;
+    $scope.projetselected._id=project._id;
+    $scope.projetselected.collaboraters=project.collaboraters;
+    $scope.editlistModal.show();
+  }
+
+  $scope.fermetureeditiondeliste = function() {
+    $scope.editlistModal.hide();
+  }
+
+  $scope.confirmationsuppressiondeliste = function() {
+    $scope.editlistModal.hide();
+    $scope.deleteModal.show();
+  }
+
+  $scope.fermeturedeconfirmationsuppressiondeliste = function() {
+    $scope.deleteModal.hide();
+    $scope.editlistModal.show();
   }
 
   $scope.inscription = function() {
@@ -233,6 +334,78 @@ angular.module('todo', ['ionic'])
       .error(function(data) {
           console.log('Error: ' + data);
       });
+    };
+
+    $scope.jeveuxplus = function (project) {
+      $scope.projetselected.liste_id=project._id;
+      $scope.projetselected.user_id=$scope.utilisateur.id;
+      $http.post('/veuxplus', $scope.projetselected)
+      .success(function(result) {
+        $http.get('/mobile/'+$scope.utilisateur.id)
+        .success(function(data) {
+          $scope.projects=data;
+        })
+        .error(function(data) {
+          console.log('Error: ' + data);
+        }); 
+      })
+      .error(function(data) {
+          console.log('Error: ' + data);
+      });
+    };
+
+    $scope.deleteCollab = function(index) {
+      $scope.collab.list_id= $scope.projetselected._id;
+      $scope.collab.lequel= index;
+      $scope.collab.liste=$scope.projetselected.collaboraters;
+      console.log($scope.collab);
+      $http.post('decollabList', $scope.collab)
+      .success(function(result) {
+        $http.get('/mobile/'+$scope.utilisateur.id)
+        .success(function(data) {
+          $scope.projects=data;
+          $scope.projetselected.name=$scope.projects.listes[$scope.projetselected.index].name;
+          $scope.projetselected.description=$scope.projects.listes[$scope.projetselected.index].description;
+          $scope.projetselected._id=$scope.projects.listes[$scope.projetselected.index]._id;
+          $scope.projetselected.collaboraters=$scope.projects.listes[$scope.projetselected.index].collaboraters;
+        })
+        .error(function(data) {
+          console.log('Error: ' + data);
+        }); 
+      })
+      .error(function(data) {
+          console.log('Error: ' + data);
+      });
+    };
+
+    $scope.createCollab = function() {
+      $scope.collab.list_id= $scope.projetselected._id;
+      $http.post('collabList', $scope.collab)
+        .success(function(result) {
+          console.log(result.toString())
+          if (result.toString()=="false"){
+            $scope.response.color='red';
+            $scope.response.text6="Collaboration échouée, pas d'utilisateur "+$scope.collab.name+" trouvé.";
+          } else {
+            $http.get('/mobile/'+$scope.utilisateur.id)
+            .success(function(data) {
+              $scope.projects=data;
+              $scope.projetselected.name=$scope.projects.listes[$scope.projetselected.index].name;
+              $scope.projetselected.description=$scope.projects.listes[$scope.projetselected.index].description;
+              $scope.projetselected._id=$scope.projects.listes[$scope.projetselected.index]._id;
+              $scope.projetselected.collaboraters=$scope.projects.listes[$scope.projetselected.index].collaboraters;
+            })
+            .error(function(data) {
+              console.log('Error: ' + data);
+            }); 
+            $scope.response.color='green';
+            $scope.response.text6="Collaboration avec "+$scope.collab.name+" créee.";
+
+          }
+        })
+        .error(function(data) {
+            console.log('Error: ' + data);
+        });
     };
 
   $scope.retour = function() {
@@ -284,6 +457,7 @@ angular.module('todo', ['ionic'])
   // Open our new task modal
   $scope.newTask = function() {
     $scope.response.text3 = '';
+    $scope.newtask.name = "";
     $scope.taskModal.show();
   };
 

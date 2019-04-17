@@ -46,6 +46,26 @@
     {
       "path": "/api/laliste/create/",
       "proxyUrl": "https://todo-polytech.herokuapp.com/todolists/api/laliste/create/"
+    },
+    {
+      "path": "/api/laliste/edit/",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/todolists/api/laliste/edit/"
+    },
+    {
+      "path": "/api/laliste/mdelete/",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/todolists/api/laliste/mdelete/"
+    },
+    {
+      "path": "/collabList",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/collabList"
+    },
+    {
+      "path": "/decollabList",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/decollabList"
+    },
+    {
+      "path": "/veuxplus",
+      "proxyUrl": "https://todo-polytech.herokuapp.com/veuxplus"
     }
   ]
 }
