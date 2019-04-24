@@ -1,153 +1,299 @@
+<!-- SEUL PAGE DE L'APPLICATION IONIC -->
 <!DOCTYPE html>
+
 <html>
+
   <head>
+
     <meta charset="utf-8">
+
     <title>Todolist-Mobile</title>
+
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
 
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <!-- côté AngularJS -->
+
     <script src="js/app.js"></script>
-    <!-- Cordova ? Qu'est ce donc cette sorcellerie ? -->
+
+
     <script src="cordova.js"></script>
+
     <style>
+
       .capitalize {
+
       text-transform: capitalize;
+
       }
+
     </style>
+
   </head>
+
   <body ng-app="todo" ng-controller="TodoCtrl">
+
     <ion-side-menus>
 
-
-    <!-- Center content -->
+    <!-- Content du centre de l'application -->
     <ion-side-menu-content>
+
       <ion-header-bar class="bar-dark">
 
         <button class="button button-icon" ng-click="toggleProjects()">
+
           <i class="icon ion-navicon"></i>
+
         </button>
  
         <h2 ng-show="utilisateur.username" class="title">
+
           Espace de 
           <span class="capitalize">{{utilisateur.username}}</span>
           
         </h2>
         
         <!-- New Task button-->
+
         <button side="right" class="button button-icon" ng-click="newTask()">
+
           <i class="icon ion-compose"></i>
+
         </button>
 
       </ion-header-bar>
 
       <ion-content>
-        <!-- our list and list items -->
+
+        <!-- Quand la liste n'est pas encore choisi -->
         <span ng-show="!tasks">
+
           <br><br><br><br><br><br>
+
           <center><img width="10%" src="img/cat3.png">
-          <h3>Tu n'as pas encore choisi de liste !</h3>
+
+          <h3>
+            Tu n'as pas encore choisi de liste !
+          </h3>
+
           <img width="10%" src="img/arrow.png"></center>
+
         </span>
+
+        <!-- Quand la liste est choisi, l'utilisateur identifié -->
         <div ng-show="utilisateur.username && tasks">
+
           <br>
+
           <center>
-          <h3>{{tasks.name}}</h3>
-          <h4>{{tasks.description}}</h4>
+
+          <h3>
+            {{tasks.name}}
+          </h3>
+
+          <h4>
+            {{tasks.description}}
+          </h4>
+
           <br>
+
           <button class="button button-icon" ng-click="deleteAll()">
+
             <i class="icon ion-trash-a">Supprimer les tâches faites</i>
+
           </button>
+
           <br>
+
         </center>
+
         </div>
+
         <ion-list>
+
           <ion-item ng-repeat="task in tasks.tasks">
+
           <span ng-dblclick="modifyTask($index,task)" id="task-{{$index}}">
+
           <button class="button button-icon" ng-click="deleteTask(task._id)">
+
               <i class="icon ion-trash-b"></i>
+
             </button>
+
           <span ng-style="task.done && { 'text-decoration' : 'line-through' }">
+
             N°{{$index+1}} | Par <span ng-show="{{task.creator}}=='null'">anonyme</span>
+
             {{task.creator}} : -> {{task.text}}
+
           </span>  
-          &nbsp&nbsp&nbsp&nbsp<input type="checkbox" ng-show="utilisateur.username" id="done-{{$index}}" ng-checked="task.done" ng-click="isChecked($index, task)">
+
+          &nbsp&nbsp&nbsp&nbsp
+          
+          <input type="checkbox" ng-show="utilisateur.username" id="done-{{$index}}" ng-checked="task.done" ng-click="isChecked($index, task)">
+          
           <span ng-click="modifyTask($index,task)" ng-show="utilisateur.username" class="badge">✎</span>
-          </span>
+          
+        </span>
+
           <span id="input-{{$index}}" style="display: none;">
+
               <input type="text" ng-model="new.text"> <span ng-click="modifyTask($index,task)" class="badge">✅</span>
+          
           </span>
+
           </ion-item>
+
         </ion-list>
+
       </ion-content>
+
     </ion-side-menu-content>
 
-        <!-- Left menu -->
-        <ion-side-menu side="left">
-          <ion-header-bar class="bar-dark">
-            <h1 class="title">Tes listes</h1>
-            <button class="button button-icon ion-plus" ng-click="creationdeliste()">
-            </button>
-          </ion-header-bar>
-          <ion-content scroll="false">
-            <ion-list>
-              <ion-item ng-repeat="project in projects.listes">
-                <div ng-click="selectProject(project)">
-                <h2>N°{{$index+1}} |
-                {{project.name}}</h2>
-                <span ng-show="'{{project.creator.username}}'=='{{utilisateur.username}}'">de vous-même</span>
-                <span ng-show="'{{project.creator.username}}'!='{{utilisateur.username}}'">de {{project.creator.username}}</span>
-                <hr>  
-                <h4>{{project.description}}</h4>
-                <hr>
-                <h6 ng-show="project.collaboraters.length==0">Pas encore de collaborateurs</h6>
-                <h6 ng-show="project.collaboraters.length>0">Collaboration avec 
-                <span ng-repeat="collabo in project.collaboraters">
-                  <span ng-show="'{{collabo.username}}'!='{{utilisateur.username}}'">
-                  {{collabo.username}}
-                  </span>
-                  <span ng-show="'{{collabo.username}}'=='{{utilisateur.username}}'">
-                  vous-même
-                  </span>
-                </span>
-              </h6>
-            </div>
-              <span ng-show="'{{project.creator.username}}'=='{{utilisateur.username}}'" ng-click="creationeditiondeliste(project, $index)" class="badge">✎</span>
-              <span ng-show="'{{project.creator.username}}'!='{{utilisateur.username}}'" ng-click="jeveuxplus(project)" class="badge">❌</span>
-            </ion-item>
-            </ion-list>
-          </ion-content>
-        </ion-side-menu>
 
+        <!-- Menu du gauche -->
+
+        <ion-side-menu side="left">
+
+          <ion-header-bar class="bar-dark">
+
+            <h1 class="title">
+              Tes listes
+            </h1>
+
+            <button class="button button-icon ion-plus" ng-click="creationdeliste()">
+
+            </button>
+
+          </ion-header-bar>
+
+          <ion-content scroll="false">
+
+            <ion-list>
+
+              <ion-item ng-repeat="project in projects.listes">
+
+                <div ng-click="selectProject(project)">
+
+                <h2>N°{{$index+1}} |
+
+                {{project.name}}</h2>
+
+                <span ng-show="'{{project.creator.username}}'=='{{utilisateur.username}}'">de vous-même</span>
+
+                <span ng-show="'{{project.creator.username}}'!='{{utilisateur.username}}'">de {{project.creator.username}}</span>
+                
+                <hr>  
+
+                <h4>
+                  {{project.description}}
+                </h4>
+
+                <hr>
+
+                <h6 ng-show="project.collaboraters.length==0">Pas encore de collaborateurs</h6>
+
+                <h6 ng-show="project.collaboraters.length>0">Collaboration avec 
+
+                <span ng-repeat="collabo in project.collaboraters">
+
+                  <span ng-show="'{{collabo.username}}'!='{{utilisateur.username}}'">
+
+                  {{collabo.username}}
+
+                  </span>
+
+                  <span ng-show="'{{collabo.username}}'=='{{utilisateur.username}}'">
+
+                  vous-même
+
+                  </span>
+
+                </span>
+
+              </h6>
+
+            </div>
+
+              <span ng-show="'{{project.creator.username}}'=='{{utilisateur.username}}'" ng-click="creationeditiondeliste(project, $index)" class="badge">✎</span>
+              
+              <span ng-show="'{{project.creator.username}}'!='{{utilisateur.username}}'" ng-click="jeveuxplus(project)" class="badge">❌</span>
+            
+            </ion-item>
+            
+          </ion-list>
+          
+        </ion-content>
+        
+      </ion-side-menu>
+
+
+    <!-- LES MODALS -->
+
+
+
+     <!-- MODAL DE CONNEXION -->
     <script id="connect.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Connectez-vous à votre service de todolist</h1>
+
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
+
           <br>
+
           <center><img width="20%" id="lechat" src="img/cat.ico"></center>
+
           <form ng-submit="authentification(user)">
+
             <div class="list">
+
               <label class="item item-input">
+
                 <input type="text" placeholder="Ton nom d'utilisateur" ng-model="user.username">
+
               </label>
+
               <label class="item item-input">
+
                 <input type="password" placeholder="Ton mot de passe" ng-model="user.password">
+
               </label>
+
             </div>
+
             <div class="padding">
+
               <button type="submit" class="button button-block button-positive">Connectez vous !</button>
-              <center><div class="col-6"><p><font color="{{response.color}}">{{response.text}}</font></p></div></center>
+
+              <center>
+                <div class="col-6">
+                  <p>
+                    <font color="{{response.color}}">
+                      {{response.text}}
+                    </font>
+                  </p>
+                </div>
+              </center>
+
             </div>
-            <center><a ng-click="inscription()">Pas encore inscrit ?</a></center>
+
+            <center>
+              <a ng-click="inscription()">
+                Pas encore inscrit ?
+              </a>
+            </center>
           </form>
 
         </ion-content>
@@ -156,38 +302,77 @@
 
     </script>
 
+
+
+    <!-- MODAL D'INSCRIPTION -->
     <script id="inscrire.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Inscrivez-vous à ce service de todolist</h1>
+
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
+
           <br>
-          <center><img width="20%" src="img/cat2.ico"></center>
+
+          <center>
+            <img width="20%" src="img/cat2.ico">
+          </center>
+
           <form id="formInscr" ng-submit="inscrire(user)">
+
             <div class="list">
+
               <label class="item item-input">
+
                 <input type="text" id="nom" placeholder="Ton nom d'utilisateur" ng-model="user.username">
+
                 <span id="aidenom"></span>
+
               </label>
+
               <label class="item item-input">
+
                 <input type="password" id="pass1" placeholder="Ton mot de passe" ng-model="user.password">
+
                 <span id="aidemdp"></span>
+
               </label>
+
               <label class="item item-input">
+
                   <input type="password" id="pass2" placeholder="Confirme ton mot de passe" ng-model="user.passwordconf">
+                  
                   <span id="aidemdp2"></span>
+
                 </label>
+
             </div>
+
             <div class="padding">
+
               <button type="submit" class="button button-block button-positive">Inscrivez vous !</button>
+              
             </div>
-            <center><div class="col-6"><p><font color="{{response.color}}">{{response.text2}}</font></p></div></center>
+
+            <center>
+              <div class="col-6">
+                <p>
+                  <font color="{{response.color}}">
+                    {{response.text2}}
+                  </font>
+                </p>
+              </div>
+            </center>
+
           </form>
 
         </ion-content>
@@ -196,29 +381,54 @@
 
     </script>
 
+
+
+    <!-- MODAL D'AJOUT DE TACHE -->
     <script id="new-task.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Nouvelle tâche</h1>
+
           <button class="button button-clear button-positive" ng-click="closeNewTask()">Annuler</button>
+
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
 
           <form ng-submit="createTask(newtask)">
+
             <div class="list">
+
               <label class="item item-input">
+
                 <input type="text" placeholder="Qu'as-tu besoin de faire ?" ng-model="newtask.name">
+
               </label>
+
             </div>
+
             <div class="padding">
+
               <button type="submit" class="button button-block button-positive">Créer une tâche</button>
+
             </div>
-            <center><div class="col-6"><p><font color="{{response.color}}">{{response.text3}}</font></p></div></center>
+
+            <center>
+              <div class="col-6">
+                <p>
+                  <font color="{{response.color}}">
+                    {{response.text3}}
+                  </font>
+                </p>
+              </div>
+            </center>
           </form>
 
         </ion-content>
@@ -227,30 +437,57 @@
 
     </script>
 
+
+
+    <!-- MODAL DE NOUVELLE LISTE -->
     <script id="new-list.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Nouvelle liste</h1>
+
           <button class="button button-clear button-positive" ng-click="fermeturedeliste()">Annuler</button>
+
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
 
           <form ng-submit="createList(liste)">
+
             <div class="list">
+
               <label class="item item-input">
+
                 <input type="text" placeholder="Quel nom pour cette liste ?" ng-model="liste.name">
+
                 <input type="text" placeholder="Quelle est sa description ?" ng-model="liste.description">
+
               </label>
+
             </div>
+
             <div class="padding">
+
               <button type="submit" class="button button-block button-positive">Créer une liste</button>
+
             </div>
-            <center><div class="col-6"><p><font color="{{response.color}}">{{response.text4}}</font></p></div></center>
+
+            <center>
+              <div class="col-6">
+                <p>
+                  <font color="{{response.color}}">
+                    {{response.text4}}
+                  </font>
+                </p>
+              </div>
+            </center>
+
           </form>
 
         </ion-content>
@@ -259,81 +496,164 @@
 
     </script>
 
+
+
+    <!-- MODAL D'EDITION LISTE -->
     <script id="edit-list.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Edition de liste</h1>
+
           <button class="button button-clear button-positive" ng-click="fermetureeditiondeliste()">Annuler</button>
+
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
+
           <form ng-submit="editList(projetselected)">
+
             <div class="list">
+
               <label class="item item-input">
+
                 <input type="text" ng-model="projetselected.name">
+
                 <input type="text" ng-model="projetselected.description">
+
               </label>
-              <center><div class="col-6"><p><font color="{{response.color}}">{{response.text5}}</font></p></div></center>
+
+              <center>
+                <div class="col-6">
+                  <p>
+                    <font color="{{response.color}}">
+                      {{response.text5}}
+                    </font>
+                  </p>
+                </div>
+              </center>
+
             </div>
+
             <div class="padding">
+
               <button type="submit" class="button button-block button-positive">Confirmer les modifications</button>
+
               </form>
+
               <br>
+
               <form ng-submit="createCollab()">
+
               <h4>Les collaborateurs :</h4>
+
               <label class="item item-input">
+
                 <input type="text" placeholder="Quels collaborateurs ?" ng-model="collab.name">
+
               </label>
+
               <br>
+
               <button type="submit" class="button button-block button-positive">Ajouter un collaborateur</button>
+
               </form>
-              <center><div class="col-6"><p><font color="{{response.color}}">{{response.text6}}</font></p></div></center>
+
+              <center>
+                <div class="col-6">
+                  <p>
+                    <font color="{{response.color}}">
+                      {{response.text6}}
+                    </font>
+                  </p>
+                </div>
+              </center>
+
               <span ng-repeat="collabo in projetselected.collaboraters">
+
                   <span ng-show="'{{collabo.username}}'!='{{utilisateur.username}}'">
-                  <ion-label color="light" ng-click="deleteCollab($index)">{{collabo.username}}<span>❌</span></ion-label>
+
+                  <ion-label color="light" ng-click="deleteCollab($index)">
+
+                    {{collabo.username}}
+
+                    <span>❌</span>
+
+                  </ion-label>
+
                   </span>
+
               </span>
+
               <br>
+
               <button type="text" class="button button-block button-negative" ng-click="confirmationsuppressiondeliste()">Supprimer la liste</button>
+            
             </div>
           
-
         </ion-content>
 
       </div>
 
     </script>
 
+
+    <!-- MODAL DE SUPPRESSION LISTE -->
     <script id="delete-list.html" type="text/ng-template">
 
       <div class="modal">
 
         <!-- Modal header bar -->
+
         <ion-header-bar class="bar-secondary">
+
           <h1 class="title">Suppression définitive de votre liste</h1>
           
         </ion-header-bar>
 
         <!-- Modal content area -->
+
         <ion-content>
+
           <div class="padding">
+
             <br>
-            <center><h4>Êtes-vous sûr de voloir supprimer «<b>{{projetselected.name}}</b>» ?</h4></center>
+
+            <center>
+
+              <h4>Êtes-vous sûr de voloir supprimer «<b>{{projetselected.name}}</b>» ?</h4>
+
+            </center>
+
             <br>
+
             <div class="grid-container">
+
                 <div class="grid-item"> 
+
                   <button type="text" class="button button-block button-positive" ng-click="deleteList()">Oui</button>
+                
                 </div>
+
                 <div class="grid-item">
+
+                  
                   <button type="text" class="button button-block button-negative" ng-click="fermeturedeconfirmationsuppressiondeliste()">Non</button>
+               
                 </div>
+
               </div>
+
             </div>
+
         </ion-content>
+
       </div>
 
     </script>
